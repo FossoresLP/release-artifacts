@@ -6,6 +6,7 @@
   "dependencies": {
     "@actions/artifact": "^0.4.0",
     "@actions/core": "^1.2.6",
+    "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",
     "mime-types": "^2.1.27",
     "mustache": "^4.0.1"

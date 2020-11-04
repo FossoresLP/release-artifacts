@@ -7,6 +7,7 @@ import { lookup } from 'mime-types';
 import { getInput, setOutput, setFailed, info, debug, warning } from '@actions/core';
 import { create } from '@actions/artifact';
 import { getOctokit, context } from '@actions/github';
+import { exec, ExecOptions } from '@actions/exec';
 
 /*
 
@@ -26,9 +27,25 @@ const fileTypes = ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.app
 
 async function run() {
 	try {
+		// Get current tag
+		let tag: string = "";
+
+		const options: ExecOptions = {
+			listeners: {
+				stdout: (data: Buffer) => {
+					tag += data.toString();
+				},
+				stderr: (data: Buffer) => setFailed("git tag error: " + data.toString())
+			}
+		};
+
+		await exec('git', ['tag', '--points-at', context.sha], options);
+
 		// Exit if current build is not tagged
-		if (!context.ref.startsWith("refs/tags/")) {
-			info("Current ref is not a tag, skipping");
+		if (tag) {
+			info("Using tag " + tag);
+		} else {
+			info("No tag found, exiting");
 			return;
 		}
 
@@ -51,7 +68,7 @@ async function run() {
 		const createReleaseResponse = await github.repos.createRelease({
 			owner: context.repo.owner,
 			repo: context.repo.repo,
-			tag_name: context.ref.replace('refs/tags/', ''),
+			tag_name: tag,
 			name: getInput('title', { required: true }),
 			body: body,
 			draft: getInput('draft', { required: false }) === 'true',
