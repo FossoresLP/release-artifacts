@@ -14042,7 +14042,8 @@ function run() {
                     stderr: (data) => (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed)("git tag error: " + data.toString())
                 }
             };
-            yield (0,_actions_exec__WEBPACK_IMPORTED_MODULE_7__.exec)('git', ['tag', '--points-at', _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.sha], options);
+            //await exec('git', ['tag', '--points-at', context.sha], options);
+            yield (0,_actions_exec__WEBPACK_IMPORTED_MODULE_7__.exec)('git', ['describe', '--tags', '--exact-match']);
             // Exit if current build is not tagged
             if (tag) {
                 (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Using tag " + tag);

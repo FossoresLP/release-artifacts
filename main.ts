@@ -39,7 +39,8 @@ async function run() {
 			}
 		};
 
-		await exec('git', ['tag', '--points-at', context.sha], options);
+		//await exec('git', ['tag', '--points-at', context.sha], options);
+		await exec('git', ['describe', '--tags', '--exact-match']);
 
 		// Exit if current build is not tagged
 		if (tag) {
