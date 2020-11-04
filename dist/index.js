@@ -12874,6 +12874,7 @@ function run() {
         try {
             // Exit if current build is not tagged
             if (!_actions_github__WEBPACK_IMPORTED_MODULE_6__.context.ref.startsWith("refs/tags/")) {
+                (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Current ref is not a tag, skipping");
                 return;
             }
             // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
