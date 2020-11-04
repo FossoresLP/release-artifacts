@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: touch test.deb
+        env:
+          TEST_DATA: "Hello world"
+          TEST_LINK: "https://github.com"
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
@@ -27,4 +30,5 @@ jobs:
           path: test.deb
       - uses: ./
         with:
-          milliseconds: 1000
+         title: Hello world
+         template: test.md
