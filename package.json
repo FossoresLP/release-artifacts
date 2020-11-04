@@ -1,0 +1,25 @@
+{
+  "name": "release",
+  "version": "0.0.1",
+  "description": "Release artifacts of a build on GitHub",
+  "main": "main.ts",
+  "dependencies": {
+    "@actions/artifact": "^0.4.0",
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "mime-types": "^2.1.27",
+    "mustache": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^2.1.0",
+    "@types/mustache": "^4.0.1",
+    "@types/node": "^14.11.2",
+    "typescript": "^4.0.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pascal Vorwerk <info@fossores.de>",
+  "license": "MIT",
+  "private": true
+}
