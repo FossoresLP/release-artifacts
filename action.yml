@@ -22,8 +22,8 @@ outputs:
   url:
     description: 'The URL users can navigate to in order to view the release'
 runs:
-  using: 'node14'
-  main: 'main.mjs'
+  using: 'node12'
+  main: 'dist/main.js'
 branding:
   icon: 'tag'
   color: 'gray-dark'
