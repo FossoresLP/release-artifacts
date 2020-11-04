@@ -109,7 +109,8 @@ async function run() {
 			const files = readdirSync(response.downloadPath);
 
 			for(const path of files) {
-				const fileName = basename(path)
+				const fileName = basename(path);
+				const fileSize = statSync(path).size;
 
 				info(`Uploading ${fileName}.`);
 
@@ -119,9 +120,10 @@ async function run() {
 					release_id: releaseID,
 					data: "",
 					url: uploadURL,
-					headers: { 'Content-Type': lookup(fileName) || 'application/octet-stream', 'Content-Length': statSync(path).size },
+					headers: { 'Content-Type': lookup(fileName) || 'application/octet-stream', 'Content-Length': fileSize },
 					name: fileName,
-					file: readFileSync(path)
+					file: readFileSync(path),
+					size: fileSize
 				}).catch((err) => {
 					warning(`Failed to upload ${fileName}: ` + err.message);
 				});
