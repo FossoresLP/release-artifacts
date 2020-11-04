@@ -13984,8 +13984,8 @@ function wrappy (fn, cb) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5747);
-/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9225);
+/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs_promises__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5622);
 /* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var mustache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8272);
@@ -14061,7 +14061,7 @@ function run() {
             const github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_6__.getOctokit)((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('token', { required: true }));
             let template = null;
             try {
-                template = (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('template', { required: true }), { encoding: 'utf8' });
+                template = yield (0,fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile)((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('template', { required: true }), { encoding: 'utf8' });
             }
             catch (error) {
                 (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed)(error.message);
@@ -14083,10 +14083,10 @@ function run() {
             });
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Created release ${createReleaseResponse.data.name}`);
             // Get the ID, html_url, and upload URL for the created Release from the response
-            const { data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl } } = createReleaseResponse;
+            const { data: { id: releaseID, html_url: htmlURL, upload_url: uploadURL } } = createReleaseResponse;
             // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setOutput)('id', releaseId);
-            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setOutput)('url', htmlUrl);
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setOutput)('id', releaseID);
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setOutput)('url', htmlURL);
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Downloading artifacts");
             const artifactClient = (0,_actions_artifact__WEBPACK_IMPORTED_MODULE_5__/* .create */ .U)();
             const downloadResponse = yield artifactClient.downloadAllArtifacts();
@@ -14095,20 +14095,23 @@ function run() {
                 if (!response.artifactName.startsWith("release_")) {
                     continue;
                 }
-                const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(response.downloadPath);
-                (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
-                github.repos.uploadReleaseAsset({
-                    owner: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.owner,
-                    repo: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.repo,
-                    release_id: releaseId,
-                    data: "",
-                    url: uploadUrl,
-                    headers: { 'Content-Type': (0,mime_types__WEBPACK_IMPORTED_MODULE_3__.lookup)(fileName) || 'application/octet-stream', 'Content-Length': (0,fs__WEBPACK_IMPORTED_MODULE_0__.statSync)(response.downloadPath).size },
-                    name: fileName,
-                    file: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(response.downloadPath)
-                }).catch((err) => {
-                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.warning)(`Failed to upload ${fileName}: ` + err.message);
-                });
+                const files = yield (0,fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir)(response.downloadPath);
+                for (const path in files) {
+                    const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(path);
+                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
+                    github.repos.uploadReleaseAsset({
+                        owner: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.owner,
+                        repo: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.repo,
+                        release_id: releaseID,
+                        data: "",
+                        url: uploadURL,
+                        headers: { 'Content-Type': (0,mime_types__WEBPACK_IMPORTED_MODULE_3__.lookup)(fileName) || 'application/octet-stream', 'Content-Length': (yield (0,fs_promises__WEBPACK_IMPORTED_MODULE_0__.stat)(path)).size },
+                        name: fileName,
+                        file: yield (0,fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile)(path)
+                    }).catch((err) => {
+                        (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.warning)(`Failed to upload ${fileName}: ` + err.message);
+                    });
+                }
             }
         }
         catch (error) {
@@ -14174,6 +14177,14 @@ module.exports = require("events");
 
 "use strict";
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 9225:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs/promises");
 
 /***/ }),
 
