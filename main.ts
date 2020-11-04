@@ -28,6 +28,7 @@ async function run() {
 	try {
 		// Exit if current build is not tagged
 		if (!context.ref.startsWith("refs/tags/")) {
+			info("Current ref is not a tag, skipping");
 			return;
 		}
 
