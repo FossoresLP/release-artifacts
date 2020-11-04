@@ -22,7 +22,7 @@ outputs:
   url:
     description: 'The URL users can navigate to in order to view the release'
 runs:
-  using: 'node12'
+  using: 'node14'
   main: 'main.mjs'
 branding:
   icon: 'tag'
