@@ -8,6 +8,7 @@ import { getInput, setOutput, setFailed, info, debug, warning } from '@actions/c
 import { create } from '@actions/artifact';
 import { getOctokit, context } from '@actions/github';
 import { exec, ExecOptions } from '@actions/exec';
+import { countReset } from 'console';
 
 /*
 
@@ -29,26 +30,29 @@ async function run() {
 	try {
 		// Get current tag
 		let tag: string = "";
+		let tagError: string = "";
 
 		const options: ExecOptions = {
 			listeners: {
 				stdout: (data: Buffer) => {
 					tag += data.toString();
 				},
-				stderr: (data: Buffer) => setFailed("git tag error: " + data.toString())
+				stderr: (data: Buffer) => {
+					tagError += data.toString();
+				}
 			}
 		};
 
 		//await exec('git', ['tag', '--points-at', context.sha], options);
-		await exec('git', ['describe', '--tags', '--exact-match']);
+		await exec('git', ['describe', '--tags', '--exact-match'], options);
 
 		// Exit if current build is not tagged
-		if (tag) {
-			info("Using tag " + tag);
-		} else {
-			info("No tag found, exiting");
+		if (tagError) {
+			info("No tag found: " + tagError);
 			return;
 		}
+
+		info("Using tag " + tag);
 
 		// Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
 		const github = getOctokit(process.env.GITHUB_TOKEN);

@@ -14034,24 +14034,25 @@ function run() {
         try {
             // Get current tag
             let tag = "";
+            let tagError = "";
             const options = {
                 listeners: {
                     stdout: (data) => {
                         tag += data.toString();
                     },
-                    stderr: (data) => (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed)("git tag error: " + data.toString())
+                    stderr: (data) => {
+                        tagError += data.toString();
+                    }
                 }
             };
             //await exec('git', ['tag', '--points-at', context.sha], options);
-            yield (0,_actions_exec__WEBPACK_IMPORTED_MODULE_7__.exec)('git', ['describe', '--tags', '--exact-match']);
+            yield (0,_actions_exec__WEBPACK_IMPORTED_MODULE_7__.exec)('git', ['describe', '--tags', '--exact-match'], options);
             // Exit if current build is not tagged
-            if (tag) {
-                (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Using tag " + tag);
-            }
-            else {
-                (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("No tag found, exiting");
+            if (tagError) {
+                (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("No tag found: " + tagError);
                 return;
             }
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Using tag " + tag);
             // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
             const github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_6__.getOctokit)(process.env.GITHUB_TOKEN);
             let template = null;
