@@ -1,10 +1,10 @@
 import { statSync, readFileSync } from 'fs';
-import { basename, extname } from 'path';
+import { basename } from 'path';
 
 import { render } from 'mustache';
 import { lookup } from 'mime-types';
 
-import { getInput, setOutput, setFailed, info, debug, warning } from '@actions/core';
+import { getInput, setOutput, setFailed, info, warning } from '@actions/core';
 import { create } from '@actions/artifact';
 import { getOctokit, context } from '@actions/github';
 import { exec, ExecOptions } from '@actions/exec';
@@ -18,12 +18,11 @@ GitHub Action that:
 - checks if current build is tagged
 - creates release from mustache/handlebars template
 - downloads all artifacts
-- uploads all artifacts that end in ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.appx', '.AppImage', '.snap'] to release
+- //uploads all artifacts that end in ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.appx', '.AppImage', '.snap'] to release
+- uploads all artifacts beginning with release_ to release
 - outputs release url
 
 */
-
-const fileTypes = ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.appx', '.AppImage', '.snap'];
 
 async function run() {
 	try {
@@ -66,8 +65,8 @@ async function run() {
 		} catch (error) {
 			setFailed(error.message);
 		}
-		
-		let body = render(template, JSON.parse(getInput("variables")));
+
+		let body = render(template, JSON.parse(getInput("variables") || "{}"));
 
 		info("Rendered body");
 
@@ -85,7 +84,7 @@ async function run() {
 			target_commitish: context.sha
 		});
 
-		info(`Created release with code ${createReleaseResponse.status}`);
+		info(`Created release ${createReleaseResponse.data.name}`);
 
 		// Get the ID, html_url, and upload URL for the created Release from the response
 		const {
@@ -96,33 +95,33 @@ async function run() {
 		setOutput('id', releaseId);
 		setOutput('url', htmlUrl);
 
+		info("Downloading artifacts");
+
 		const artifactClient = create();
 		const downloadResponse = await artifactClient.downloadAllArtifacts();
 
 		// Upload all artifacts to release
 		for (const response of downloadResponse) {
-			const fileName = basename(response.downloadPath);
-			const fileExt = extname(response.downloadPath);
-			if (fileTypes.indexOf(fileExt) == -1) {
-				debug(`Ignoring ${fileName} because it is of type ${fileExt}.`);
+			if (!response.artifactName.startsWith("release_")) {
 				continue;
-			} else {
-				info(`Uploading ${fileName}.`);
 			}
-			try {
-				const uploadAssetResponse = await github.repos.uploadReleaseAsset({
-					owner: context.repo.owner,
-					repo: context.repo.repo,
-					release_id: releaseId,
-					data: "",
-					url: uploadUrl,
-					headers: { 'Content-Type': lookup(fileExt) || 'application/octet-stream', 'Content-Length': statSync(response.downloadPath).size },
-					name: fileName,
-					file: readFileSync(response.downloadPath)
-				});
-			} catch (error) {
-				warning(`Failed to upload ${fileName}: ` + error.message);
-			}
+
+			const fileName = basename(response.downloadPath)
+
+			info(`Uploading ${fileName}.`);
+
+			github.repos.uploadReleaseAsset({
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				release_id: releaseId,
+				data: "",
+				url: uploadUrl,
+				headers: { 'Content-Type': lookup(fileName) || 'application/octet-stream', 'Content-Length': statSync(response.downloadPath).size },
+				name: fileName,
+				file: readFileSync(response.downloadPath)
+			}).catch((err) => {
+				warning(`Failed to upload ${fileName}: ` + err.message);
+			});
 		}
 	} catch (error) {
 		setFailed(error.message);

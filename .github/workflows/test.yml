@@ -19,15 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: touch test.deb
-        env:
-          TEST_DATA: "Hello world"
-          TEST_LINK: "https://github.com"
+      - run: touch test.png
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
-          name: test
-          path: test.deb
+          name: release_test
+          path: test.png
       - uses: ./
         with:
           title: Hello world

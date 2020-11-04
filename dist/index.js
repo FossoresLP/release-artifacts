@@ -14024,11 +14024,11 @@ GitHub Action that:
 - checks if current build is tagged
 - creates release from mustache/handlebars template
 - downloads all artifacts
-- uploads all artifacts that end in ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.appx', '.AppImage', '.snap'] to release
+- //uploads all artifacts that end in ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.appx', '.AppImage', '.snap'] to release
+- uploads all artifacts beginning with release_ to release
 - outputs release url
 
 */
-const fileTypes = ['.deb', '.rpm', '.exe', '.msi', '.pkg.tar.zst', '.apk', '.appx', '.AppImage', '.snap'];
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -14066,7 +14066,7 @@ function run() {
             catch (error) {
                 (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed)(error.message);
             }
-            let body = (0,mustache__WEBPACK_IMPORTED_MODULE_2__.render)(template, JSON.parse((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)("variables")));
+            let body = (0,mustache__WEBPACK_IMPORTED_MODULE_2__.render)(template, JSON.parse((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)("variables") || "{}"));
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Rendered body");
             // Create a release
             // API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
@@ -14081,40 +14081,34 @@ function run() {
                 prerelease: (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('prerelease', { required: false }) === 'true',
                 target_commitish: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.sha
             });
-            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Created release with code ${createReleaseResponse.status}`);
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Created release ${createReleaseResponse.data.name}`);
             // Get the ID, html_url, and upload URL for the created Release from the response
             const { data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl } } = createReleaseResponse;
             // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setOutput)('id', releaseId);
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setOutput)('url', htmlUrl);
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Downloading artifacts");
             const artifactClient = (0,_actions_artifact__WEBPACK_IMPORTED_MODULE_5__/* .create */ .U)();
             const downloadResponse = yield artifactClient.downloadAllArtifacts();
             // Upload all artifacts to release
             for (const response of downloadResponse) {
-                const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(response.downloadPath);
-                const fileExt = (0,path__WEBPACK_IMPORTED_MODULE_1__.extname)(response.downloadPath);
-                if (fileTypes.indexOf(fileExt) == -1) {
-                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.debug)(`Ignoring ${fileName} because it is of type ${fileExt}.`);
+                if (!response.artifactName.startsWith("release_")) {
                     continue;
                 }
-                else {
-                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
-                }
-                try {
-                    const uploadAssetResponse = yield github.repos.uploadReleaseAsset({
-                        owner: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.owner,
-                        repo: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.repo,
-                        release_id: releaseId,
-                        data: "",
-                        url: uploadUrl,
-                        headers: { 'Content-Type': (0,mime_types__WEBPACK_IMPORTED_MODULE_3__.lookup)(fileExt) || 'application/octet-stream', 'Content-Length': (0,fs__WEBPACK_IMPORTED_MODULE_0__.statSync)(response.downloadPath).size },
-                        name: fileName,
-                        file: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(response.downloadPath)
-                    });
-                }
-                catch (error) {
-                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.warning)(`Failed to upload ${fileName}: ` + error.message);
-                }
+                const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(response.downloadPath);
+                (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
+                github.repos.uploadReleaseAsset({
+                    owner: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.owner,
+                    repo: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.repo,
+                    release_id: releaseId,
+                    data: "",
+                    url: uploadUrl,
+                    headers: { 'Content-Type': (0,mime_types__WEBPACK_IMPORTED_MODULE_3__.lookup)(fileName) || 'application/octet-stream', 'Content-Length': (0,fs__WEBPACK_IMPORTED_MODULE_0__.statSync)(response.downloadPath).size },
+                    name: fileName,
+                    file: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(response.downloadPath)
+                }).catch((err) => {
+                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.warning)(`Failed to upload ${fileName}: ` + err.message);
+                });
             }
         }
         catch (error) {
