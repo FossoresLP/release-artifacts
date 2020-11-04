@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from 'fs/promises';
+import { readdirSync, readFileSync, statSync } from 'fs';
 import { basename } from 'path';
 
 import { render } from 'mustache';
@@ -61,7 +61,7 @@ async function run() {
 
 		let template = null;
 		try {
-			template = await readFile(getInput('template', { required: true }), { encoding: 'utf8' });
+			template = readFileSync(getInput('template', { required: true }), { encoding: 'utf8' });
 		} catch (error) {
 			setFailed(error.message);
 		}
@@ -106,7 +106,7 @@ async function run() {
 				continue;
 			}
 
-			const files = await readdir(response.downloadPath);
+			const files = readdirSync(response.downloadPath);
 
 			for(const path in files) {
 				const fileName = basename(path)
@@ -119,9 +119,9 @@ async function run() {
 					release_id: releaseID,
 					data: "",
 					url: uploadURL,
-					headers: { 'Content-Type': lookup(fileName) || 'application/octet-stream', 'Content-Length': (await stat(path)).size },
+					headers: { 'Content-Type': lookup(fileName) || 'application/octet-stream', 'Content-Length': statSync(path).size },
 					name: fileName,
-					file: await readFile(path)
+					file: readFileSync(path)
 				}).catch((err) => {
 					warning(`Failed to upload ${fileName}: ` + err.message);
 				});
