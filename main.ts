@@ -8,7 +8,6 @@ import { getInput, setOutput, setFailed, info, debug, warning } from '@actions/c
 import { create } from '@actions/artifact';
 import { getOctokit, context } from '@actions/github';
 import { exec, ExecOptions } from '@actions/exec';
-import { countReset } from 'console';
 
 /*
 
@@ -43,12 +42,15 @@ async function run() {
 			}
 		};
 
-		//await exec('git', ['tag', '--points-at', context.sha], options);
-		await exec('git', ['describe', '--tags', '--exact-match'], options);
+		await exec('git', ['fetch', '-t', '--depth=1']);
+		await exec('git', ['tag', '--points-at', context.sha], options);
 
 		// Exit if current build is not tagged
 		if (tagError) {
-			info("No tag found: " + tagError);
+			setFailed("Getting tag failed: " + tagError);
+		}
+		if (!tag) {
+			info("No tag found");
 			return;
 		}
 
