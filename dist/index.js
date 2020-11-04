@@ -12886,6 +12886,7 @@ function run() {
                 (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed)(error.message);
             }
             let body = (0,mustache__WEBPACK_IMPORTED_MODULE_2__.render)(template, process.env);
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Rendered body");
             // Create a release
             // API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
             // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-create-release
@@ -12899,6 +12900,7 @@ function run() {
                 prerelease: (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('prerelease', { required: false }) === 'true',
                 target_commitish: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.sha
             });
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Created release with code ${createReleaseResponse.status}`);
             // Get the ID, html_url, and upload URL for the created Release from the response
             const { data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl } } = createReleaseResponse;
             // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
@@ -12911,11 +12913,11 @@ function run() {
                 const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(response.downloadPath);
                 const fileExt = (0,path__WEBPACK_IMPORTED_MODULE_1__.extname)(response.downloadPath);
                 if (fileTypes.indexOf(fileExt) == -1) {
-                    console.log(`Ignoring ${fileName} because it is of type ${fileExt}.`);
+                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.debug)(`Ignoring ${fileName} because it is of type ${fileExt}.`);
                     continue;
                 }
                 else {
-                    console.log(`Uploading ${fileName}.`);
+                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
                 }
                 try {
                     const uploadAssetResponse = yield github.repos.uploadReleaseAsset({
@@ -12930,7 +12932,7 @@ function run() {
                     });
                 }
                 catch (error) {
-                    console.warn(`Failed to upload ${fileName}: ` + error.message);
+                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.warning)(`Failed to upload ${fileName}: ` + error.message);
                 }
             }
         }
