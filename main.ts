@@ -4,7 +4,7 @@ import { basename, extname } from 'path';
 import { render } from 'mustache';
 import { lookup } from 'mime-types';
 
-import { getInput, setOutput, setFailed } from '@actions/core';
+import { getInput, setOutput, setFailed, info, debug, warning } from '@actions/core';
 import { create } from '@actions/artifact';
 import { getOctokit, context } from '@actions/github';
 
@@ -42,6 +42,8 @@ async function run() {
 		}
 		let body = render(template, process.env);
 
+		info("Rendered body");
+
 		// Create a release
 		// API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
 		// Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-create-release
@@ -55,6 +57,8 @@ async function run() {
 			prerelease: getInput('prerelease', { required: false }) === 'true',
 			target_commitish: context.sha
 		});
+
+		info(`Created release with code ${createReleaseResponse.status}`);
 
 		// Get the ID, html_url, and upload URL for the created Release from the response
 		const {
@@ -73,10 +77,10 @@ async function run() {
 			const fileName = basename(response.downloadPath);
 			const fileExt = extname(response.downloadPath);
 			if (fileTypes.indexOf(fileExt) == -1) {
-				console.log(`Ignoring ${fileName} because it is of type ${fileExt}.`);
+				debug(`Ignoring ${fileName} because it is of type ${fileExt}.`);
 				continue;
 			} else {
-				console.log(`Uploading ${fileName}.`);
+				info(`Uploading ${fileName}.`);
 			}
 			try {
 				const uploadAssetResponse = await github.repos.uploadReleaseAsset({
@@ -90,7 +94,7 @@ async function run() {
 					file: readFileSync(response.downloadPath)
 				});
 			} catch (error) {
-				console.warn(`Failed to upload ${fileName}: ` + error.message);
+				warning(`Failed to upload ${fileName}: ` + error.message);
 			}
 		}
 	} catch (error) {
