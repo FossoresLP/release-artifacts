@@ -14066,7 +14066,7 @@ function run() {
             catch (error) {
                 (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed)(error.message);
             }
-            let body = (0,mustache__WEBPACK_IMPORTED_MODULE_2__.render)(template, process.env);
+            let body = (0,mustache__WEBPACK_IMPORTED_MODULE_2__.render)(template, JSON.parse((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)("variables")));
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Rendered body");
             // Create a release
             // API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release

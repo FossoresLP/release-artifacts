@@ -66,7 +66,8 @@ async function run() {
 		} catch (error) {
 			setFailed(error.message);
 		}
-		let body = render(template, process.env);
+		
+		let body = render(template, JSON.parse(getInput("variables")));
 
 		info("Rendered body");
 

@@ -1,6 +1,6 @@
 Test
 ====
 
-Data: {{TEST_DATA}}
+Data: {{data}}
 
-[Link]({{TEST_LINK}})
+[Link]({{link}})

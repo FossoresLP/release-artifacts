@@ -30,6 +30,7 @@ jobs:
           path: test.deb
       - uses: ./
         with:
-         title: Hello world
-         template: test.md
-         token: ${{ secrets.GITHUB_TOKEN }}
+          title: Hello world
+          template: test.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+          variables: '{"data": "Hello world!", "link": "https://github.com"}'

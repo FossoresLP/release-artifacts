@@ -11,6 +11,9 @@ inputs:
   token:
     description: 'GitHub token (found in secrets.GITHUB_TOKEN)'
     required: true
+  variables:
+    description: 'Variables to use for mustache template in JSON format'
+    required: false
   draft:
     description: '`true` to create a draft (unpublished) release, `false` to create a published one. Default: `true`'
     required: false
