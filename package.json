@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Release artifacts of a build on GitHub",
   "main": "main.ts",
+  "type": "module",
   "dependencies": {
     "@actions/artifact": "^0.4.0",
     "@actions/core": "^1.2.6",
