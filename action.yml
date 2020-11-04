@@ -8,6 +8,9 @@ inputs:
   title:
     description: 'The name of the release. For example, `Release v1.0.1`'
     required: true
+  token:
+    description: 'GitHub token (found in secrets.GITHUB_TOKEN)'
+    required: true
   draft:
     description: '`true` to create a draft (unpublished) release, `false` to create a published one. Default: `true`'
     required: false
@@ -18,7 +21,7 @@ inputs:
     default: 'false'
 outputs:
   id:
-    description: 'The ID of the created Release'
+    description: 'The ID of the created release'
   url:
     description: 'The URL users can navigate to in order to view the release'
 runs:

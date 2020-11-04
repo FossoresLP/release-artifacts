@@ -14045,6 +14045,7 @@ function run() {
                     }
                 }
             };
+            // Fetch tags because GitHub doesn't
             yield (0,_actions_exec__WEBPACK_IMPORTED_MODULE_7__.exec)('git', ['fetch', '-t', '--depth=1']);
             yield (0,_actions_exec__WEBPACK_IMPORTED_MODULE_7__.exec)('git', ['tag', '--points-at', _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.sha], options);
             // Exit if current build is not tagged
@@ -14057,7 +14058,7 @@ function run() {
             }
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)("Using tag " + tag);
             // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-            const github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_6__.getOctokit)(process.env.GITHUB_TOKEN);
+            const github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_6__.getOctokit)((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('token', { required: true }));
             let template = null;
             try {
                 template = (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)((0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput)('template', { required: true }), { encoding: 'utf8' });

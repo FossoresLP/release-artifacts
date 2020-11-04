@@ -42,6 +42,7 @@ async function run() {
 			}
 		};
 
+		// Fetch tags because GitHub doesn't
 		await exec('git', ['fetch', '-t', '--depth=1']);
 		await exec('git', ['tag', '--points-at', context.sha], options);
 
@@ -57,7 +58,7 @@ async function run() {
 		info("Using tag " + tag);
 
 		// Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-		const github = getOctokit(process.env.GITHUB_TOKEN);
+		const github = getOctokit(getInput('token', {required: true}));
 
 		let template = null;
 		try {
