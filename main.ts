@@ -108,7 +108,7 @@ async function run() {
 
 			const files = readdirSync(response.downloadPath);
 
-			for(const path in files) {
+			for(const path of files) {
 				const fileName = basename(path)
 
 				info(`Uploading ${fileName}.`);

@@ -14096,7 +14096,7 @@ function run() {
                     continue;
                 }
                 const files = (0,fs__WEBPACK_IMPORTED_MODULE_0__.readdirSync)(response.downloadPath);
-                for (const path in files) {
+                for (const path of files) {
                     const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(path);
                     (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
                     github.repos.uploadReleaseAsset({
