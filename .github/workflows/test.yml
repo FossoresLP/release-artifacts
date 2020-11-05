@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: touch test.png
+      - run: echo "Test" > test.png
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
