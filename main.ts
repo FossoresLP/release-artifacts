@@ -114,13 +114,10 @@ async function run() {
 
 				info(`Uploading ${fileName}.`);
 
-				// 
 				github.repos.uploadReleaseAsset({
 					owner: context.repo.owner,
 					repo: context.repo.repo,
 					release_id: releaseID,
-					url: uploadURL,
-					headers: { 'Content-Type': lookup(fileName) || 'application/octet-stream', 'Content-Length': fileSize },
 					name: fileName,
 					data: readFileSync(path)
 				}).catch((err) => {
