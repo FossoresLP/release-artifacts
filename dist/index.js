@@ -13882,7 +13882,6 @@ function run() {
                 const files = (0,fs__WEBPACK_IMPORTED_MODULE_0__.readdirSync)(response.downloadPath);
                 for (const path of files) {
                     const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(path);
-                    const fileSize = (0,fs__WEBPACK_IMPORTED_MODULE_0__.statSync)(path).size;
                     (0,_actions_core__WEBPACK_IMPORTED_MODULE_3__.info)(`Uploading ${fileName}.`);
                     github.repos.uploadReleaseAsset({
                         owner: _actions_github__WEBPACK_IMPORTED_MODULE_5__.context.repo.owner,

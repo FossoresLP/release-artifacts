@@ -1,8 +1,7 @@
-import { readdirSync, readFileSync, statSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { basename } from 'path';
 
 import { render } from 'mustache';
-import { lookup } from 'mime-types';
 
 import { getInput, setOutput, setFailed, info, warning } from '@actions/core';
 import { create } from '@actions/artifact';
@@ -110,7 +109,6 @@ async function run() {
 
 			for(const path of files) {
 				const fileName = basename(path);
-				const fileSize = statSync(path).size;
 
 				info(`Uploading ${fileName}.`);
 
