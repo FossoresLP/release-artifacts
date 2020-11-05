@@ -14100,16 +14100,15 @@ function run() {
                     const fileName = (0,path__WEBPACK_IMPORTED_MODULE_1__.basename)(path);
                     const fileSize = (0,fs__WEBPACK_IMPORTED_MODULE_0__.statSync)(path).size;
                     (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.info)(`Uploading ${fileName}.`);
+                    // 
                     github.repos.uploadReleaseAsset({
                         owner: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.owner,
                         repo: _actions_github__WEBPACK_IMPORTED_MODULE_6__.context.repo.repo,
                         release_id: releaseID,
-                        data: "",
                         url: uploadURL,
                         headers: { 'Content-Type': (0,mime_types__WEBPACK_IMPORTED_MODULE_3__.lookup)(fileName) || 'application/octet-stream', 'Content-Length': fileSize },
                         name: fileName,
-                        file: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(path),
-                        size: fileSize
+                        data: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(path)
                     }).catch((err) => {
                         (0,_actions_core__WEBPACK_IMPORTED_MODULE_4__.warning)(`Failed to upload ${fileName}: ` + err.message);
                     });
