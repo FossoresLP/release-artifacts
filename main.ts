@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'fs';
-import { basename } from 'path';
+import { basename, join } from 'path';
 
 import { render } from 'mustache';
 
@@ -87,7 +87,7 @@ async function run() {
 
 		// Get the ID, html_url, and upload URL for the created Release from the response
 		const {
-			data: { id: releaseID, html_url: htmlURL, upload_url: uploadURL }
+			data: { id: releaseID, html_url: htmlURL }
 		} = createReleaseResponse;
 
 		// Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
@@ -117,12 +117,11 @@ async function run() {
 					repo: context.repo.repo,
 					release_id: releaseID,
 					name: fileName,
-					data: readFileSync(path)
+					data: readFileSync(join(response.downloadPath, path))
 				}).catch((err) => {
 					warning(`Failed to upload ${fileName}: ` + err.message);
 				});
 			}
-			
 		}
 	} catch (error) {
 		setFailed(error.message);

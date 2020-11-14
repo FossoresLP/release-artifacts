@@ -13867,7 +13867,7 @@ function run() {
             });
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_3__.info)(`Created release ${createReleaseResponse.data.name}`);
             // Get the ID, html_url, and upload URL for the created Release from the response
-            const { data: { id: releaseID, html_url: htmlURL, upload_url: uploadURL } } = createReleaseResponse;
+            const { data: { id: releaseID, html_url: htmlURL } } = createReleaseResponse;
             // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_3__.setOutput)('id', releaseID);
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_3__.setOutput)('url', htmlURL);
@@ -13888,7 +13888,7 @@ function run() {
                         repo: _actions_github__WEBPACK_IMPORTED_MODULE_5__.context.repo.repo,
                         release_id: releaseID,
                         name: fileName,
-                        data: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(path)
+                        data: (0,fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)((0,path__WEBPACK_IMPORTED_MODULE_1__.join)(response.downloadPath, path))
                     }).catch((err) => {
                         (0,_actions_core__WEBPACK_IMPORTED_MODULE_3__.warning)(`Failed to upload ${fileName}: ` + err.message);
                     });
